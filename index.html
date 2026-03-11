@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Test - 25 MCQs</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; }
+        .timer { font-size: 20px; color: red; margin-bottom: 20px; text-align: center; }
+        .question { margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        .options { display: flex; gap: 20px; margin-top: 5px; }
+        .options label { margin-right: 15px; }
+        input[type="text"] { width: 100%; padding: 8px; margin: 5px 0 15px; border: 1px solid #ccc; border-radius: 4px; }
+        input[type="submit"] { background: #4CAF50; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        input[type="submit"]:disabled { background: #ccc; cursor: not-allowed; }
+        .status { margin-top: 15px; font-weight: bold; }
+        .note { background: #fff3cd; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>📝 Mathematics Test (25 MCQs)</h2>
+    <div class="note">
+        <strong>Instructions:</strong> 
+        <ul>
+            <li>Read the questions from the image sent on WhatsApp.</li>
+            <li>Select one option (A, B, C, D) for each question.</li>
+            <li>Enter your name and roll number.</li>
+            <li>You have <strong>45 minutes</strong> from when you first open this page.</li>
+            <li>Click Submit when finished. You can submit only once.</li>
+        </ul>
+    </div>
+    <div class="timer" id="timer">Loading timer...</div>
+
+    <form id="testForm">
+        <label for="name">Full Name:</label>
+        <input type="text" id="name" name="name" required>
+
+        <label for="roll">Roll Number:</label>
+        <input type="text" id="roll" name="roll" required>
+
+        <!-- Questions 1 to 25 will be inserted here by JavaScript -->
+        <div id="questions"></div>
+
+        <input type="submit" value="Submit Test" id="submitBtn">
+    </form>
+
+    <div id="message" class="status"></div>
+</div>
+
+<script>
+    // ================== CONFIGURATION ==================
+    // Replace with your actual Apps Script web app URL
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbw6sKSRQQQw0M8_H_Tdb5LAcoXeaPQi1UO9POLE5gL5US7Mgtmq9AkLw6Z1EgYAdpWz/exec';
+
+    // ================== GENERATE 25 QUESTIONS ==================
+    const questionsDiv = document.getElementById('questions');
+    for (let i = 1; i <= 25; i++) {
+        const qDiv = document.createElement('div');
+        qDiv.className = 'question';
+        qDiv.innerHTML = `
+            <div><strong>Q${i}.</strong></div>
+            <div class="options">
+                <label><input type="radio" name="q${i}" value="A"> A</label>
+                <label><input type="radio" name="q${i}" value="B"> B</label>
+                <label><input type="radio" name="q${i}" value="C"> C</label>
+                <label><input type="radio" name="q${i}" value="D"> D</label>
+            </div>
+        `;
+        questionsDiv.appendChild(qDiv);
+    }
+
+    // ================== 45-MINUTE TIMER ==================
+    const timerDuration = 45 * 60 * 1000; // 45 minutes in milliseconds
+    let startTime;
+
+    // Get start time from localStorage (or set it if first visit)
+    const storedStart = localStorage.getItem('testStartTime');
+    if (storedStart) {
+        startTime = parseInt(storedStart, 10);
+    } else {
+        startTime = Date.now();
+        localStorage.setItem('testStartTime', startTime);
+    }
+
+    function updateTimer() {
+        const now = Date.now();
+        const elapsed = now - startTime;
+        const remaining = timerDuration - elapsed;
+
+        if (remaining <= 0) {
+            document.getElementById('timer').innerText = '⏰ Time is up! Form is now disabled.';
+            document.getElementById('submitBtn').disabled = true;
+            document.querySelectorAll('input').forEach(input => input.disabled = true);
+            return;
+        }
+
+        const hours = Math.floor(remaining / (60 * 60 * 1000));
+        const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
+        const seconds = Math.floor((remaining % (60 * 1000)) / 1000);
+        document.getElementById('timer').innerText = `⏳ Time remaining: ${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    updateTimer();
+    setInterval(updateTimer, 1000);
+
+    // ================== FORM SUBMISSION (Single Handler) ==================
+    document.getElementById('testForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        // Don't allow submission if time is up
+        if (Date.now() - startTime > timerDuration) {
+            alert('Time is up! You cannot submit.');
+            return;
+        }
+
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.value = 'Submitting...';
+
+        // Convert FormData to URL-encoded string (works best with Apps Script)
+        const formData = new FormData(this);
+        const urlEncodedData = new URLSearchParams(formData).toString();
+
+        fetch(scriptURL, {
+            method: 'POST',
+            body: urlEncodedData,
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.result === 'success') {
+                document.getElementById('message').innerHTML = '✅ Test submitted successfully! You can close this page.';
+                localStorage.removeItem('testStartTime'); // Optional: allow retake? Remove if you want one attempt only.
+            } else {
+                throw new Error('Server returned error: ' + JSON.stringify(data));
+            }
+        })
+        .catch(error => {
+            console.error('Fetch Error:', error);
+            document.getElementById('message').innerHTML = `❌ Submission failed: ${error.message}. Please check console (F12) and contact teacher.`;
+            submitBtn.disabled = false;
+            submitBtn.value = 'Submit Test';
+        });
+    });
+
+    // Optional: warn before leaving if time still running
+    window.addEventListener('beforeunload', function (e) {
+        if (Date.now() - startTime < timerDuration) {
+            e.preventDefault();
+            e.returnValue = '';
+        }
+    });
+</script>
+</body>
+</html>
