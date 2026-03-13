@@ -1,165 +1,640 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Math Test - 25 MCQs</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 8px; }
-        .timer { font-size: 20px; color: red; margin-bottom: 20px; text-align: center; }
-        .question { margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
-        .options { display: flex; gap: 20px; margin-top: 5px; }
-        .options label { margin-right: 15px; }
-        input[type="text"] { width: 100%; padding: 8px; margin: 5px 0 15px; border: 1px solid #ccc; border-radius: 4px; }
-        input[type="submit"] { background: #4CAF50; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
-        input[type="submit"]:disabled { background: #ccc; cursor: not-allowed; }
-        .status { margin-top: 15px; font-weight: bold; }
-        .note { background: #fff3cd; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>📐 Math Test – 25 MCQs (One row per student)</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+    }
+    body {
+      background: #e9eef2;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 16px 10px;
+    }
+    .test-wrapper {
+      max-width: 1300px;
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      gap: 20px;
+      background: transparent;
+    }
+    /* LEFT PANEL – questions & controls */
+    .left-panel {
+      flex: 2;
+      min-width: 0;
+      background: white;
+      border-radius: 32px 32px 24px 24px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+      padding: 22px 18px 30px;
+    }
+    /* RIGHT PANEL – fixed image */
+    .right-panel {
+      flex: 1;
+      min-width: 260px;
+      background: white;
+      border-radius: 32px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+      padding: 20px 15px;
+      height: fit-content;
+      position: sticky;
+      top: 16px;
+    }
+    /* responsive: on mobile, stack (image on top) */
+    @media (max-width: 750px) {
+      .test-wrapper {
+        flex-direction: column-reverse;
+      }
+      .right-panel {
+        position: static;
+        width: 100%;
+        margin-bottom: 16px;
+      }
+    }
+
+    /* header & student info */
+    .test-header {
+      margin-bottom: 22px;
+    }
+    .test-header h2 {
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: #0a4b44;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .test-header h2 span {
+      background: #25D366;
+      color: white;
+      font-size: 1.1rem;
+      padding: 6px 14px;
+      border-radius: 40px;
+    }
+    .badge-timer {
+      background: #f0ece2;
+      padding: 10px 16px;
+      border-radius: 40px;
+      font-weight: 600;
+      color: #b45f06;
+      border-left: 5px solid #0a4b44;
+      margin: 15px 0 10px;
+      font-size: 1.2rem;
+      display: inline-block;
+    }
+    .student-info {
+      background: #f7f9fc;
+      border-radius: 28px;
+      padding: 18px 16px;
+      border: 1px solid #cfdde6;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin: 16px 0 20px;
+    }
+    .student-info .field {
+      flex: 1 1 200px;
+    }
+    .student-info label {
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #1e3b3a;
+      display: block;
+      margin-bottom: 5px;
+    }
+    .student-info input {
+      width: 100%;
+      padding: 12px 18px;
+      border: 1px solid #bccbd6;
+      border-radius: 40px;
+      font-size: 1rem;
+      background: white;
+    }
+    .student-info input:focus {
+      border-color: #0f6b5e;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(7,94,84,0.2);
+    }
+
+    /* questions grid */
+    .questions-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin: 20px 0 25px;
+    }
+    .q-item {
+      background: #ffffff;
+      border: 1px solid #dee9f0;
+      border-radius: 28px;
+      padding: 16px 18px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.02);
+    }
+    .q-num {
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #0b4e45;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .q-num::before {
+      content: "Q";
+      background: #0b4e45;
+      color: white;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      font-size: 0.9rem;
+      margin-right: 6px;
+    }
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 25px;
+      row-gap: 12px;
+      align-items: center;
+      padding-left: 10px;
+    }
+    .option-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f3f8fc;
+      padding: 6px 18px 6px 12px;
+      border-radius: 36px;
+      border: 1px solid #c5d9e8;
+    }
+    .option-item input[type="radio"] {
+      width: 20px;
+      height: 20px;
+      accent-color: #0b4e45;
+      transform: scale(1);
+      margin: 0;
+      flex-shrink: 0;
+    }
+    .option-item label {
+      font-size: 1.1rem;
+      font-weight: 500;
+      color: #173e3a;
+      letter-spacing: 0.5px;
+    }
+
+    /* action buttons */
+    .submit-area {
+      margin-top: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      align-items: center;
+      justify-content: space-between;
+    }
+    button {
+      background: #0b4e45;
+      border: none;
+      color: white;
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      border-radius: 60px;
+      cursor: pointer;
+      box-shadow: 0 6px 12px rgba(4, 75, 62, 0.3);
+      transition: 0.15s;
+      border: 1px solid #1c7b6e;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+    button:hover {
+      background: #1a6e61;
+      transform: scale(1.02);
+    }
+    button:disabled {
+      opacity: 0.5;
+      pointer-events: none;
+      background: #56746c;
+    }
+    .teacher-tools {
+      background: #f0f0f0;
+      border-radius: 40px;
+      padding: 18px 20px;
+      margin-top: 30px;
+      border: 1px solid #c0cbd4;
+    }
+    .teacher-tools summary {
+      font-weight: 700;
+      color: #044e41;
+      cursor: pointer;
+      font-size: 1.1rem;
+    }
+    .teacher-tools .config-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin: 15px 0 10px;
+      align-items: center;
+    }
+    .config-row input, .config-row button {
+      padding: 10px 16px;
+      border-radius: 40px;
+      border: 1px solid gray;
+      font-size: 0.95rem;
+    }
+    .config-row button {
+      background: #254e46;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+    }
+    .share-link {
+      background: white;
+      padding: 12px;
+      border-radius: 30px;
+      border: 1px solid #0b4e45;
+      word-break: break-all;
+      font-size: 0.9rem;
+    }
+
+    /* right panel image */
+    .image-container {
+      text-align: center;
+    }
+    .image-container h3 {
+      color: #0b4e45;
+      margin-bottom: 12px;
+      font-size: 1.4rem;
+      font-weight: 600;
+      border-bottom: 2px dashed #bccfcf;
+      padding-bottom: 8px;
+    }
+    .question-img {
+      max-width: 100%;
+      max-height: 70vh;
+      border-radius: 30px;
+      border: 3px solid #cfe2e0;
+      box-shadow: 0 8px 18px rgba(0,40,30,0.2);
+      background: #eef5f3;
+      object-fit: contain;
+    }
+    .img-placeholder {
+      background: #e2eeeb;
+      border-radius: 28px;
+      padding: 30px 10px;
+      color: #2c5a52;
+      font-style: italic;
+    }
+    .timer-danger {
+      color: #c02121;
+      font-weight: 700;
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-    <h2>📝 Mathematics Test (25 MCQs)</h2>
-    <div class="note">
-        <strong>Instructions:</strong> 
-        <ul>
-            <li>Read the questions from the image sent on WhatsApp.</li>
-            <li>Select one option (A, B, C, D) for each question.</li>
-            <li>Enter your name and roll number.</li>
-            <li>You have <strong>45 minutes</strong> from when you first open this page.</li>
-            <li>Click Submit when finished. You can submit only once.</li>
-        </ul>
+<div class="test-wrapper">
+  <!-- LEFT: questions & student form -->
+  <div class="left-panel" id="leftPanel">
+    <div class="test-header">
+      <h2>📘 Math Test <span>25 Questions</span></h2>
+      <div class="badge-timer" id="timerDisplay">Time: 01:30:00 remaining</div>
     </div>
-    <div class="timer" id="timer">Loading timer...</div>
+    <!-- student name & roll -->
+    <div class="student-info">
+      <div class="field">
+        <label>👤 Student Name</label>
+        <input type="text" id="studentName" placeholder="Enter full name" autocomplete="off">
+      </div>
+      <div class="field">
+        <label>🎫 Roll Number</label>
+        <input type="text" id="studentRoll" placeholder="Roll number">
+      </div>
+    </div>
 
-    <form id="testForm">
-        <label for="name">Full Name:</label>
-        <input type="text" id="name" name="name" required>
+    <!-- 25 MCQs dynamically injected via js -->
+    <div class="questions-grid" id="questionsContainer"></div>
 
-        <label for="roll">Roll Number:</label>
-        <input type="text" id="roll" name="roll" required>
+    <!-- submit & status -->
+    <div class="submit-area">
+      <button id="submitBtn">📤 Submit Answers</button>
+      <span id="formMessage" style="font-weight:500; color:#1d5e51;"></span>
+    </div>
 
-        <!-- Questions 1 to 25 will be inserted here by JavaScript -->
-        <div id="questions"></div>
+    <!-- TEACHER TOOLS (collapsible) -->
+    <details class="teacher-tools">
+      <summary>⚙️ Teacher settings</summary>
+      <div class="config-row">
+        <input type="text" id="imageUrlInput" placeholder="Image URL (question paper)" value="https://via.placeholder.com/600x800?text=Math+Question+Paper+Upload+Here" style="flex:3">
+        <button id="setImageBtn">Set Image</button>
+      </div>
+      <div class="config-row">
+        <label>⏱️ End time: </label>
+        <input type="datetime-local" id="endTimePicker">
+        <button id="setEndTimeBtn">Set End Time</button>
+      </div>
+      <div class="config-row">
+        <button id="generateLinkBtn">🔗 Generate Student Link</button>
+      </div>
+      <div class="share-link" id="shareableLink">Link will appear here</div>
+      <p style="font-size:0.9rem; margin-top:12px;">⭐ Google Sheet Setup: <a href="#" id="gsheetGuideLink" target="_blank">Instructions</a> — Paste your Web App URL below</p>
+      <div class="config-row">
+        <input type="url" id="scriptUrlInput" placeholder="Google Apps Script Web App URL" value="YOUR_SCRIPT_URL">
+        <button id="saveScriptUrl">Save</button>
+      </div>
+    </details>
+  </div>
 
-        <input type="submit" value="Submit Test" id="submitBtn">
-    </form>
-
-    <div id="message" class="status"></div>
+  <!-- RIGHT: question paper image -->
+  <div class="right-panel">
+    <div class="image-container">
+      <h3>📄 Question Paper (Questions in image)</h3>
+      <img id="questionPaperImage" class="question-img" src="https://via.placeholder.com/600x800?text=Math+Question+Paper+Upload+Here" alt="MCQs image">
+      <p style="margin-top:10px;color:#2b5d54;">25 questions are in the image above</p>
+    </div>
+  </div>
 </div>
 
 <script>
-    // ================== CONFIGURATION ==================
-    // Replace with your actual Apps Script web app URL
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbxtN-8VV-cbpz5JNig1eGO4lfcyU-R3C1G8hcsV9w1lgZ4MWjDFRKnjoVBgUceBNh8h/exec';
+  (function() {
+    // ---------- CONFIG / DEFAULTS ----------
+    const DEFAULT_IMAGE = "https://via.placeholder.com/600x800?text=Upload+Math+MCQs+Image+Here&fontsize=24";
+    // Google Apps Script URL (replace after deployment)
+    const DEFAULT_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx----YOUR_SCRIPT_ID----/exec"; 
+    // For testing, we use a placeholder; teacher must update.
 
-    // ================== GENERATE 25 QUESTIONS ==================
-    const questionsDiv = document.getElementById('questions');
-    for (let i = 1; i <= 25; i++) {
+    // ---------- GLOBAL VARIABLES ----------
+    let endTime = null;                 // timestamp (ms)
+    let timerInterval = null;
+    let googleScriptUrl = localStorage.getItem('gsScriptUrl') || DEFAULT_SCRIPT_URL;
+
+    // ---------- HELPER: LOAD FROM URL PARAMS ----------
+    function getQueryParams() {
+      let params = new URLSearchParams(window.location.search);
+      return {
+        img: params.get('img') || null,
+        end: params.get('end') || null    // ISO string or timestamp?
+      };
+    }
+
+    // ---------- INITIAL SETUP FROM URL ----------
+    function applyUrlParams() {
+      const params = getQueryParams();
+      // image
+      let imageUrl = params.img ? decodeURIComponent(params.img) : (localStorage.getItem('testImage') || DEFAULT_IMAGE);
+      document.getElementById('questionPaperImage').src = imageUrl;
+      document.getElementById('imageUrlInput').value = imageUrl;
+      // end time
+      if (params.end) {
+        let endTimestamp = parseInt(params.end);
+        if (!isNaN(endTimestamp) && endTimestamp > Date.now()) {
+          endTime = endTimestamp;
+        } else {
+          // fallback: now + 1.5h
+          endTime = Date.now() + 90*60*1000;
+        }
+      } else {
+        // default end time 1.5h from now if not set
+        endTime = Date.now() + 90*60*1000;
+      }
+      // store endTime in a hidden input / variable
+      updateEndTimePickerFromEndTime();
+    }
+
+    // convert endTime to datetime-local string
+    function msToDatetimeLocal(ms) {
+      let d = new Date(ms);
+      let year = d.getFullYear();
+      let month = (d.getMonth() + 1).toString().padStart(2,'0');
+      let day = d.getDate().toString().padStart(2,'0');
+      let hour = d.getHours().toString().padStart(2,'0');
+      let minute = d.getMinutes().toString().padStart(2,'0');
+      return `${year}-${month}-${day}T${hour}:${minute}`;
+    }
+
+    function updateEndTimePickerFromEndTime() {
+      if (endTime) {
+        document.getElementById('endTimePicker').value = msToDatetimeLocal(endTime);
+      }
+    }
+
+    // ---------- GENERATE 25 QUESTIONS ----------
+    function renderQuestions() {
+      const container = document.getElementById('questionsContainer');
+      container.innerHTML = '';
+      for (let i = 1; i <= 25; i++) {
         const qDiv = document.createElement('div');
-        qDiv.className = 'question';
+        qDiv.className = 'q-item';
         qDiv.innerHTML = `
-            <div><strong>Q${i}.</strong></div>
-            <div class="options">
-                <label><input type="radio" name="q${i}" value="A"> A</label>
-                <label><input type="radio" name="q${i}" value="B"> B</label>
-                <label><input type="radio" name="q${i}" value="C"> C</label>
-                <label><input type="radio" name="q${i}" value="D"> D</label>
-            </div>
+          <div class="q-num">${i}</div>
+          <div class="options" id="q-${i}">
+            <div class="option-item"><input type="radio" name="q${i}" value="A" id="q${i}A"><label for="q${i}A">A</label></div>
+            <div class="option-item"><input type="radio" name="q${i}" value="B" id="q${i}B"><label for="q${i}B">B</label></div>
+            <div class="option-item"><input type="radio" name="q${i}" value="C" id="q${i}C"><label for="q${i}C">C</label></div>
+            <div class="option-item"><input type="radio" name="q${i}" value="D" id="q${i}D"><label for="q${i}D">D</label></div>
+          </div>
         `;
-        questionsDiv.appendChild(qDiv);
+        container.appendChild(qDiv);
+      }
     }
 
-    // ================== 45-MINUTE TIMER ==================
-    const timerDuration = 45 * 60 * 1000; // 45 minutes in milliseconds
-    let startTime;
-
-    // Get start time from localStorage (or set it if first visit)
-    const storedStart = localStorage.getItem('testStartTime');
-    if (storedStart) {
-        startTime = parseInt(storedStart, 10);
-    } else {
-        startTime = Date.now();
-        localStorage.setItem('testStartTime', startTime);
+    // ---------- DISABLE INPUTS AFTER TIME ----------
+    function disableTest(disabled = true) {
+      const radios = document.querySelectorAll('input[type="radio"]');
+      const textInputs = [document.getElementById('studentName'), document.getElementById('studentRoll')];
+      const submitBtn = document.getElementById('submitBtn');
+      radios.forEach(r => r.disabled = disabled);
+      textInputs.forEach(i => i.disabled = disabled);
+      submitBtn.disabled = disabled;
     }
 
+    // timer update
     function updateTimer() {
-        const now = Date.now();
-        const elapsed = now - startTime;
-        const remaining = timerDuration - elapsed;
-
-        if (remaining <= 0) {
-            document.getElementById('timer').innerText = '⏰ Time is up! Form is now disabled.';
-            document.getElementById('submitBtn').disabled = true;
-            document.querySelectorAll('input').forEach(input => input.disabled = true);
-            return;
-        }
-
-        const hours = Math.floor(remaining / (60 * 60 * 1000));
-        const minutes = Math.floor((remaining % (60 * 60 * 1000)) / (60 * 1000));
-        const seconds = Math.floor((remaining % (60 * 1000)) / 1000);
-        document.getElementById('timer').innerText = `⏳ Time remaining: ${hours}h ${minutes}m ${seconds}s`;
+      if (!endTime) return;
+      const now = Date.now();
+      const diff = endTime - now;
+      const timerEl = document.getElementById('timerDisplay');
+      if (diff <= 0) {
+        timerEl.innerHTML = `⏰ Time over`;
+        timerEl.classList.add('timer-danger');
+        disableTest(true);
+        if (timerInterval) clearInterval(timerInterval);
+        return;
+      }
+      const hours = Math.floor(diff / (3600*1000));
+      const minutes = Math.floor((diff % (3600*1000)) / (60*1000));
+      const seconds = Math.floor((diff % (60*1000)) / 1000);
+      timerEl.innerHTML = `⏳ Time remaining: ${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+      timerEl.classList.remove('timer-danger');
     }
 
-    updateTimer();
-    setInterval(updateTimer, 1000);
+    function startTimer() {
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = setInterval(updateTimer, 500);
+      updateTimer();
+    }
 
-    // ================== FORM SUBMISSION (Single Handler) ==================
-    document.getElementById('testForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+    // ---------- COLLECT ANSWERS ----------
+    function collectAnswers() {
+      let answers = {};
+      for (let i = 1; i <= 25; i++) {
+        let selected = document.querySelector(`input[name="q${i}"]:checked`);
+        answers[`Q${i}`] = selected ? selected.value : '';
+      }
+      return answers;
+    }
 
-        // Don't allow submission if time is up
-        if (Date.now() - startTime > timerDuration) {
-            alert('Time is up! You cannot submit.');
-            return;
-        }
-
-        const submitBtn = document.getElementById('submitBtn');
-        submitBtn.disabled = true;
-        submitBtn.value = 'Submitting...';
-
-        // Convert FormData to URL-encoded string (works best with Apps Script)
-        const formData = new FormData(this);
-        const urlEncodedData = new URLSearchParams(formData).toString();
-
-        fetch(scriptURL, {
-            method: 'POST',
-            body: urlEncodedData,
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.result === 'success') {
-                document.getElementById('message').innerHTML = '✅ Test submitted successfully! You can close this page.';
-                localStorage.removeItem('testStartTime'); // Optional: allow retake? Remove if you want one attempt only.
-            } else {
-                throw new Error('Server returned error: ' + JSON.stringify(data));
-            }
-        })
-        .catch(error => {
-            console.error('Fetch Error:', error);
-            document.getElementById('message').innerHTML = `❌ Submission failed: ${error.message}. Please check console (F12) and contact teacher.`;
-            submitBtn.disabled = false;
-            submitBtn.value = 'Submit Test';
+    // ---------- SUBMIT TO GOOGLE APPS SCRIPT ----------
+    async function submitToGoogleSheet(payload) {
+      if (!googleScriptUrl || googleScriptUrl === 'YOUR_SCRIPT_URL' || googleScriptUrl === DEFAULT_SCRIPT_URL) {
+        alert("Please set the Google Script URL in Teacher settings first. (See instructions)");
+        return false;
+      }
+      try {
+        const response = await fetch(googleScriptUrl, {
+          method: 'POST',
+          mode: 'no-cors', // to avoid CORS in AppsScript, but response will be opaque
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
         });
+        // With no-cors we can't read response, but request is sent.
+        document.getElementById('formMessage').innerText = '✅ Submitted!';
+        return true;
+      } catch (e) {
+        console.error(e);
+        document.getElementById('formMessage').innerText = '❌ Error, try again';
+        return false;
+      }
+    }
+
+    // ---------- SUBMIT HANDLER ----------
+    document.getElementById('submitBtn').addEventListener('click', async function(e) {
+      const name = document.getElementById('studentName').value.trim();
+      const roll = document.getElementById('studentRoll').value.trim();
+      if (!name || !roll) {
+        alert('Name and roll number are required');
+        return;
+      }
+      if (endTime && Date.now() > endTime) {
+        alert('Time is over');
+        return;
+      }
+      const answers = collectAnswers();
+      const payload = {
+        timestamp: new Date().toISOString(),
+        name: name,
+        roll: roll,
+        ...answers
+      };
+      // Also store locally (backup)
+      let allSubmissions = JSON.parse(localStorage.getItem('testSubmissions') || '[]');
+      allSubmissions.push(payload);
+      localStorage.setItem('testSubmissions', JSON.stringify(allSubmissions));
+
+      await submitToGoogleSheet(payload);
+      // optional: disable further changes? we can keep enabled for same student but warn.
+      document.getElementById('studentName').disabled = true;
+      document.getElementById('studentRoll').disabled = true;
     });
 
-    // Optional: warn before leaving if time still running
-    window.addEventListener('beforeunload', function (e) {
-        if (Date.now() - startTime < timerDuration) {
-            e.preventDefault();
-            e.returnValue = '';
+    // ---------- TEACHER TOOLS: set image, end time, link generation ----------
+    document.getElementById('setImageBtn').addEventListener('click', function() {
+      let url = document.getElementById('imageUrlInput').value.trim();
+      if (!url) url = DEFAULT_IMAGE;
+      document.getElementById('questionPaperImage').src = url;
+      localStorage.setItem('testImage', url);
+    });
+
+    document.getElementById('setEndTimeBtn').addEventListener('click', function() {
+      let dt = document.getElementById('endTimePicker').value;
+      if (dt) {
+        endTime = new Date(dt).getTime();
+        if (endTime < Date.now()) {
+          alert('Selected time is in the past. Setting to +1.5 hours from now.');
+          endTime = Date.now() + 90*60*1000;
         }
+        updateEndTimePickerFromEndTime();
+        startTimer();
+      }
     });
-</script>
-</body>
 
+    document.getElementById('generateLinkBtn').addEventListener('click', function() {
+      let imageUrl = encodeURIComponent(document.getElementById('imageUrlInput').value.trim() || DEFAULT_IMAGE);
+      let end = endTime || (Date.now() + 90*60*1000);
+      let base = window.location.href.split('?')[0];
+      let shareLink = `${base}?img=${imageUrl}&end=${end}`;
+      document.getElementById('shareableLink').innerText = shareLink;
+      // also copy to clipboard?
+      navigator.clipboard?.writeText(shareLink);
+    });
+
+    document.getElementById('saveScriptUrl').addEventListener('click', function() {
+      let newUrl = document.getElementById('scriptUrlInput').value.trim();
+      if (newUrl) {
+        googleScriptUrl = newUrl;
+        localStorage.setItem('gsScriptUrl', newUrl);
+        alert('Google Script URL saved');
+      }
+    });
+
+    // Load scriptUrl from local storage
+    if (localStorage.getItem('gsScriptUrl')) {
+      googleScriptUrl = localStorage.getItem('gsScriptUrl');
+      document.getElementById('scriptUrlInput').value = googleScriptUrl;
+    }
+
+    // ---------- PAGE INIT ----------
+    renderQuestions();
+    applyUrlParams();
+    startTimer();
+
+    // If endTime from params is in past, adjust
+    if (endTime && endTime < Date.now()) {
+      endTime = Date.now() + 90*60*1000;
+      updateEndTimePickerFromEndTime();
+      startTimer();
+    }
+
+    // Show google sheet guide (simple alert with instructions)
+    document.getElementById('gsheetGuideLink').addEventListener('click', (e) => {
+      e.preventDefault();
+      alert(`📌 Google Sheets Setup:
+1. Create a new sheet with 28 columns: Timestamp, Name, Roll, Q1...Q25
+2. Go to Extensions > Apps Script
+3. Create a new Web App (doPost function)
+4. Deploy as web app -> get URL
+5. Paste that URL in the field above
+Example script: function doPost(e) {
+  var sheet = SpreadsheetApp.openById('YOUR_SHEET_ID').getActiveSheet();
+  var data = JSON.parse(e.postData.contents);
+  sheet.appendRow([data.timestamp, data.name, data.roll, data.Q1, data.Q2, ...]);
+}`);
+    });
+
+    // Optional: when teacher changes datetime-local, update endTime
+    document.getElementById('endTimePicker').addEventListener('change', function(e) {
+      let val = e.target.value;
+      if (val) endTime = new Date(val).getTime();
+    });
+
+    // ensure radio buttons stay enabled/disabled according to timer
+    window.addEventListener('load', function() {
+      if (endTime && endTime < Date.now()) disableTest(true);
+    });
+
+  })();
+</script>
+
+<!-- hidden instructions & fallback -->
+<div style="display: none;">🌟 Instructions: Teacher sets image URL & end time, generates link and shares with students. Students see image, select answers, submit. Data goes to Google Sheet. Export CSV from sheet with all rows.</div>
+</body>
 </html>
